@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sabor Raiz Premium</title>
+    <link href="https://fonts.googleapis.com/css?family=Lobster&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
+    <style>
+        /* ESTILOS EXATOS DO PDF */
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: 'Poppins', sans-serif; background:#f4f6f8; display:flex; min-height:100vh; color:#333; overflow:hidden; }
+        
+        .sidebar { width:280px; background:#fff; padding:30px 20px; display:flex; flex-direction:column; box-shadow:4px 0 15px rgba(0,0,0,.05); overflow-y:auto; }
+        .logo { font-family: 'Lobster', cursive; font-size:36px; color:#E84A27; text-align:center; margin-bottom:40px; }
+        .nav-menu { display:flex; flex-direction:column; gap:10px; flex:1; }
+        .nav-item { padding: 15px 20px; border-radius:14px; cursor:pointer; transition:.3s; font-weight:500; display:flex; align-items:center; gap:12px; text-decoration:none; color:#333; }
+        .nav-item:hover { background:#fafafa; transform:translateX(5px); color:#E84A27; }
+        .nav-item.active { background:#FBDCD5; color:#E84A27; }
+        .logout-btn { margin-top:auto; color:#d9534f; font-weight: bold; }
+        
+        .main { flex:1; padding:40px; overflow-y:auto; }
+        .page { display:none; }
+        .page.active { display:block; animation:fade .4s ease; }
+        @keyframes fade { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+        
+        .header { display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; gap:20px; flex-wrap:wrap; }
+        .search { background:#fff; padding: 14px 20px; border-radius:20px; display:flex; align-items:center; width:320px; box-shadow:0 5px 15px rgba(0,0,0,.05); }
+        .search input { border:none; outline:none; width:100%; margin-left:10px; font-family: 'Poppins', sans-serif; }
+        
+        .categories { display:flex; gap:15px; overflow:auto; padding-bottom:10px; margin-bottom:35px; }
+        .category-btn { padding: 10px 22px; border-radius:30px; border:none; background:#fff; cursor:pointer; font-weight:500; transition:.3s; border:1px solid #ddd; white-space:nowrap; }
+        .category-btn:hover { border-color:#E84A27; color:#E84A27; }
+        .category-btn.active { background:#E84A27; color:#fff; border-color:#E84A27; }
+        
+        .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:30px; }
+        .card { background:#fff; border-radius:20px; overflow:hidden; box-shadow:0 5px 20px rgba(0,0,0,.05); transition:.3s; display:flex; flex-direction:column; }
+        .card:hover { transform:translateY(-8px); }
+        .card img { width:100%; height:200px; object-fit:cover; }
+        .card-info { padding:20px; display:flex; flex-direction:column; flex:1; }
+        .card-title { font-size:18px; font-weight:600; margin-bottom:8px; }
+        .card-desc { font-size:13px; color:#777; line-height:1.5; margin-bottom:20px; flex:1; }
+        .card-footer { display:flex; justify-content:space-between; align-items:center; gap:10px; }
+        .price { font-size:24px; font-weight:700; color:#E84A27; }
+        .btn-add { width:45px; height:45px; border:none; border-radius:50%; background:#5DB053; color:#fff; font-size:24px; cursor:pointer; transition:.3s; }
+        .btn-add:hover { transform:scale(1.08); background:#499140; }
+        
+        .cart-item { display:flex; justify-content:space-between; padding: 15px 0; border-bottom:1px solid #eee; align-items:center; }
+        .remove-btn { color:#d9534f; cursor:pointer; font-size:13px; font-weight:600; }
+        .total { font-size:26px; font-weight:700; margin-top:20px; text-align:right; color:#E84A27; }
+        
+        .btn { padding: 15px 20px; border:none; border-radius:10px; cursor:pointer; font-weight:600; font-family: 'Poppins', sans-serif; transition:.3s; width: 100%;}
+        .btn-primary { background:#E84A27; color:#fff; }
+        .btn-primary:hover { background:#d63f1f; }
+        .btn-green { background:#5DB053; color:#fff; }
+        .btn-danger { background:#d9534f; color:#fff; }
+        
+        .panel { background:#fff; padding:30px; border-radius:20px; box-shadow:0 5px 15px rgba(0,0,0,.05); max-width:700px; }
+        .form-group { margin-bottom:18px; }
+        .form-group label { display:block; margin-bottom:8px; font-weight:500; }
+        .form-group input, .form-group textarea, .form-group select { width:100%; padding:14px; border:1px solid #ddd; border-radius:10px; font-family: 'Poppins', sans-serif; outline:none; }
+        .form-group input:focus, .form-group textarea:focus { border-color:#E84A27; }
+        
+        .profile { display:flex; gap:30px; align-items:center; background:#fff; padding:30px; border-radius:20px; max-width:700px; box-shadow:0 5px 15px rgba(0,0,0,.05); }
+        .avatar { width:110px; height: 110px; border-radius:50%; background:#FBDCD5; display:flex; justify-content:center; align-items:center; font-size:40px; }
+        
+        .toast { position:fixed; top:20px; right:20px; background:#5DB053; color:#fff; padding: 16px 25px; border-radius:12px; z-index:9999; box-shadow:0 10px 25px rgba(0,0,0,.2); animation:fade .3s ease; }
+        
+        @media (max-width:900px){
+            body { flex-direction:column; overflow:auto; }
+            .sidebar { width:100%; }
+            .main { padding:25px; }
+            .profile { flex-direction:column; text-align:center; }
+            .search { width:100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="logo">Sabor Raiz</div>
+        <div class="nav-menu">
+            <div class="nav-item active" onclick="showPage('cardapio', this)">Cardápio</div>
+            <div class="nav-item" onclick="showPage('carrinho', this)">Carrinho (<span id="cart-count">0</span>)</div>
+            <div class="nav-item" onclick="showPage('pedidos', this)">Pedidos</div>
+            <div class="nav-item" onclick="showPage('perfil', this)">Perfil</div>
+            <div class="nav-item" onclick="showPage('config', this)">Configurações</div>
+            
+          
+            
+            <div class="nav-item logout-btn" onclick="sairFirebase()" id="btnSairSidebar" style="display: none;">Sair da Conta</div>
+        </div>
+    </div>
+
+    <div class="main">
+        
+        <section id="cardapio" class="page active">
+            <div class="header">
+                <h1>O que vamos pedir hoje?</h1>
+                <div class="search">
+                    <input type="text" placeholder="Buscar..." id="searchInput" onkeyup="searchProducts()">
+                </div>
+            </div>
+            
+            <div class="categories" id="categories">
+                <button class="category-btn active">Carregando Categorias...</button>
+            </div>
+            
+            <div class="grid" id="productGrid">
+                <p style="color:#777;">Conectando ao Firebase...</p>
+            </div>
+        </section>
+
+        <section id="carrinho" class="page">
+            <h1>Seu Carrinho</h1><br>
+            <div class="panel">
+                <div id="cartItems"><p style="color:#777;text-align:center;">Carrinho vazio</p></div>
+                <div class="total" id="cartTotal">Total: R$ 0,00</div><br>
+                <div class="form-group">
+                    <label>Forma de pagamento</label>
+                    <select id="payment">
+                        <option value="pix">PIX</option>
+                        <option value="credito">Cartão de Crédito</option>
+                        <option value="dinheiro">Dinheiro</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="finishOrder()">Finalizar Pedido</button>
+            </div>
+        </section>
+
+        <section id="pedidos" class="page">
+            <h1>Meus Pedidos</h1><br>
+            <div id="orders">
+                <p style="color: #777;">Nenhum pedido realizado.</p>
+            </div>
+        </section>
+
+        <section id="perfil" class="page">
+            <h1>Meu Perfil</h1><br>
+
+            <div class="panel" id="telaLogin">
+                <h2 style="margin-bottom: 15px;">Entrar na Conta</h2>
+                <div class="form-group">
+                    <input type="email" id="emailFirebase" placeholder="Seu E-mail">
+                </div>
+                <div class="form-group">
+                    <input type="password" id="senhaFirebase" placeholder="Sua Senha">
+                </div>
+                <button class="btn btn-green" onclick="entrarFirebase()">Fazer Login ou Registrar</button>
+                <p style="margin-top: 15px; font-size: 14px; color: #666; text-align: center;">
+                    Se a conta não existir, criaremos uma automaticamente para você.
+             <button class="btn btn-primary" style="margin-top: 10px;" onclick="window.location.href='página de login/index.html'">
+    Criar Nova Conta
+</button>
+
+   </p>
+            </div>
+
+            <div id="telaPerfilLogado" style="display: none;">
+                <div class="profile">
+                    <div class="avatar">👨🏽</div>
+                    <div>
+                        <h2>Usuário Cliente</h2>
+                        <p id="emailLogado">carregando@email.com</p>
+                        <p style="color: #5DB053; font-weight: bold; margin-top: 5px;">Conta Conectada</p>
+                    </div>
+                </div>
+                <br>
+                <button class="btn btn-danger" style="max-width: 700px;" onclick="sairFirebase()">
+                    Sair da Conta do Firebase
+                </button>
+            </div>
+        </section>
+
+        <section id="config" class="page">
+            <h1>Configurações</h1><br>
+            <div class="panel">
+                <div class="form-group"><label><input type="checkbox" checked> Notificações</label></div>
+                <div class="form-group"><label><input type="checkbox" checked> Promoções</label></div>
+                <button class="btn btn-primary">Salvar Configurações</button>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // --- 1. INICIAR FIREBASE ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCBV3BRsynzIAS1jAcl124nYPeyUWHzfC0",
+            authDomain: "projeto-sabor-raiz.firebaseapp.com",
+            projectId: "projeto-sabor-raiz",
+            storageBucket: "projeto-sabor-raiz.firebasestorage.app",
+            messagingSenderId: "911413350410",
+            appId: "1:911413350410:web:49be44cc4a0c9e255b8ff3"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        let cart = [];
+
+        // --- 2. SISTEMA DE LOGIN E LOGOUT (MEU PERFIL) ---
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // Está Logado
+                document.getElementById('telaLogin').style.display = 'none';
+                document.getElementById('telaPerfilLogado').style.display = 'block';
+                document.getElementById('btnSairSidebar').style.display = 'flex';
+                document.getElementById('emailLogado').innerText = user.email;
+            } else {
+                // Não está Logado
+                document.getElementById('telaLogin').style.display = 'block';
+                document.getElementById('telaPerfilLogado').style.display = 'none';
+                document.getElementById('btnSairSidebar').style.display = 'none';
+                
+                // Limpa os campos
+                document.getElementById('emailFirebase').value = '';
+                document.getElementById('senhaFirebase').value = '';
+            }
+        });
+
+        function entrarFirebase() {
+            const email = document.getElementById('emailFirebase').value.trim();
+            const senha = document.getElementById('senhaFirebase').value;
+
+            if(!email || !senha) {
+                return toast('Preencha e-mail e senha', '#d9534f');
+            }
+
+            auth.signInWithEmailAndPassword(email, senha)
+                .then(() => {
+                    toast('Login realizado com sucesso!');
+                })
+                .catch((error) => {
+                    // Se não encontrar o e-mail, cria a conta automaticamente
+                    if (error.code === 'auth/user-not-found') {
+                        auth.createUserWithEmailAndPassword(email, senha)
+                            .then(() => toast('Conta criada e logada com sucesso!'))
+                            .catch(e => toast('Erro ao criar conta: ' + e.message, '#d9534f'));
+                    } else {
+                        toast('Erro no login: Verifique a senha', '#d9534f');
+                    }
+                });
+        }
+
+        function sairFirebase() {
+            auth.signOut().then(() => {
+                toast('Você saiu da conta!');
+                showPage('perfil', document.querySelectorAll('.nav-item')[3]);
+            });
+        }
+
+        // --- 3. CARREGAR DADOS DO FIREBASE EM TEMPO REAL ---
+        window.onload = () => {
+            updateCart();
+
+            // Puxa as Categorias do banco
+            db.collection("categories").onSnapshot((snapshot) => {
+                let catHtml = `<button class="category-btn active" onclick="filterCategory('todos', this)">Todos</button>`;
+                snapshot.forEach(doc => {
+                    let cat = doc.data();
+                    catHtml += `<button class="category-btn" onclick="filterCategory('${cat.label}', this)">${cat.label}</button>`;
+                });
+                document.getElementById('categories').innerHTML = catHtml;
+            });
+
+            // Puxa os Lanches do banco
+            db.collection("products").onSnapshot((snapshot) => {
+                let gridHtml = '';
+                if (snapshot.empty) {
+                    gridHtml = '<p style="color:#777;">O cardápio está vazio no momento.</p>';
+                } else {
+                    snapshot.forEach(doc => {
+                        let prod = doc.data();
+                        gridHtml += `
+                        <div class="card product-card" data-category="${prod.category}">
+                            <img src="${prod.image}" alt="${prod.name}">
+                            <div class="card-info">
+                                <div class="card-title">${prod.name}</div>
+                                <div class="card-desc">${prod.desc}</div>
+                                <div class="card-footer">
+                                    <div class="price">R$ ${Number(prod.price).toFixed(2).replace('.', ',')}</div>
+                                    <button class="btn-add" onclick="addCart('${prod.name}', ${prod.price})">+</button>
+                                </div>
+                            </div>
+                        </div>`;
+                    });
+                }
+                document.getElementById('productGrid').innerHTML = gridHtml;
+            });
+        };
+
+        // --- 4. FUNÇÕES GERAIS DO APP (IGUAL AO PDF) ---
+        function showPage(id, element) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(element) element.classList.add('active');
+        }
+
+        function filterCategory(category, element) {
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+            document.querySelectorAll('.product-card').forEach(card => {
+                let cat = card.dataset.category;
+                card.style.display = (category === 'todos' || cat === category) ? "flex" : "none";
+            });
+        }
+
+        function searchProducts() {
+            let value = document.getElementById('searchInput').value.toLowerCase();
+            document.querySelectorAll('.product-card').forEach(card => {
+                let title = card.querySelector('.card-title').innerText.toLowerCase();
+                let desc = card.querySelector('.card-desc').innerText.toLowerCase();
+                card.style.display = (title.includes(value) || desc.includes(value)) ? "flex" : "none";
+            });
+        }
+
+        function addCart(name, price) {
+            cart.push({ name, price });
+            updateCart();
+            toast(name + " adicionado ao carrinho!");
+        }
+
+        function removeCart(index) {
+            cart.splice(index, 1);
+            updateCart();
+            toast("Produto removido do carrinho", "#d9534f");
+        }
+
+        function updateCart() {
+            let container = document.getElementById('cartItems');
+            let total = 0;
+            document.getElementById('cart-count').innerText = cart.length;
+
+            if(cart.length === 0) {
+                container.innerHTML = '<p style="color:#777;text-align:center;">Carrinho vazio</p>';
+                document.getElementById('cartTotal').innerText = "Total: R$ 0,00";
+                return;
+            }
+
+            let html = "";
+            cart.forEach((item, index) => {
+                total += item.price;
+                html += `
+                <div class="cart-item">
+                    <div>
+                        <strong>${item.name}</strong><br>
+                        <span class="remove-btn" onclick="removeCart(${index})">Remover</span>
+                    </div>
+                    <div>R$ ${item.price.toFixed(2).replace('.', ',')}</div>
+                </div>`;
+            });
+            
+            container.innerHTML = html;
+            document.getElementById('cartTotal').innerText = `Total: R$ ${total.toFixed(2).replace('.', ',')}`;
+        }
+
+        function finishOrder() {
+            if(cart.length === 0) {
+                return toast("Seu carrinho está vazio", "#d9534f");
+            }
+            if(!auth.currentUser) {
+                toast("Por favor, faça login para pedir!", "#d9534f");
+                return showPage('perfil', document.querySelectorAll('.nav-item')[3]);
+            }
+            
+            let metodo = document.getElementById('payment').value;
+            let total = cart.reduce((a,b) => a + b.price, 0);
+            let pedidoId = Math.floor(Math.random() * 9000) + 1000;
+
+            let orderHtml = `
+            <div class="panel" style="margin-bottom:15px;">
+                <strong>Pedido #${pedidoId}</strong> - Realizado com sucesso<br>
+                Valor: R$ ${total.toFixed(2).replace('.', ',')} - Forma: ${metodo.toUpperCase()}
+            </div>`;
+            
+            let ordersDiv = document.getElementById('orders');
+            if(ordersDiv.innerHTML.includes("Nenhum pedido")) ordersDiv.innerHTML = "";
+            ordersDiv.innerHTML = orderHtml + ordersDiv.innerHTML;
+            
+            cart = [];
+            updateCart();
+            toast("Pedido realizado com sucesso!");
+            showPage('pedidos', document.querySelectorAll('.nav-item')[2]);
+        }
+
+        function toast(text, color="#5DB053") {
+            let div = document.createElement('div');
+            div.className = "toast";
+            div.style.background = color;
+            div.innerText = text;
+            document.body.appendChild(div);
+            setTimeout(() => { div.remove(); }, 3000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Lanche Sabor Raiz</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Poppins',sans-serif;
+    min-height:100vh;
+    background:
+    linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+    url('hambúrguer.jpeg')
+    center/cover no-repeat fixed;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+/* CARD */
+.card{
+    width:100%;
+    max-width:950px;
+    background:rgba(255,255,255,0.15);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    border-radius:30px;
+    overflow:hidden;
+    display:flex;
+    box-shadow:0 10px 40px rgba(0,0,0,0.4);
+}
+
+/* ESQUERDA */
+.left{
+    flex:1;
+    background:linear-gradient(180deg,#ffd4c1,#ffb190);
+    padding:50px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+}
+
+.logo{
+    font-size:80px;
+    margin-bottom:20px;
+    animation:flutuar 3s infinite ease-in-out;
+}
+
+@keyframes flutuar{
+    0%{transform:translateY(0);}
+    50%{transform:translateY(-10px);}
+    100%{transform:translateY(0);}
+}
+
+.left h1{
+    font-family:'Lobster',cursive;
+    font-size:60px;
+    color:#E84A27;
+    line-height:1;
+    margin-bottom:20px;
+}
+
+.left p{
+    color:#444;
+    font-size:16px;
+    max-width:300px;
+}
+
+/* DIREITA */
+.right{
+    flex:1;
+    background:#fff;
+    padding:60px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+}
+
+.right h2{
+    font-size:32px;
+    margin-bottom:20px;
+    color:#222;
+}
+
+/* INPUTS */
+.group{
+    margin-bottom:20px;
+}
+
+.group label{
+    display:block;
+    margin-bottom:8px;
+    font-size:14px;
+    color:#666;
+}
+
+.group input{
+    width:100%;
+    padding:15px;
+    border:none;
+    border-radius:14px;
+    background:#f1f2f4;
+    font-size:15px;
+    transition:0.3s;
+}
+
+.group input:focus{
+    outline:none;
+    border:2px solid #E84A27;
+    background:#fff;
+    box-shadow:0 0 0 5px rgba(232,74,39,0.15);
+}
+
+/* MENSAGENS NA PÁGINA */
+.msg-box {
+    padding: 12px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    text-align: center;
+    font-weight: 500;
+    display: none;
+}
+
+.msg-erro {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fca5a5;
+    display: block;
+}
+
+.msg-sucesso {
+    background-color: #dcfce7;
+    color: #15803d;
+    border: 1px solid #86efac;
+    display: block;
+}
+
+/* LINKS */
+.top-link{
+    text-align:right;
+    margin-bottom:25px;
+}
+
+.top-link a{
+    color:#E84A27;
+    text-decoration:none;
+    font-size:14px;
+}
+
+.top-link a:hover{
+    text-decoration:underline;
+}
+
+/* BOTÃO */
+button{
+    width:100%;
+    padding:16px;
+    border:none;
+    border-radius:14px;
+    background:#5DB053;
+    color:#fff;
+    font-size:16px;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover{
+    background:#4b9742;
+    transform:translateY(-2px);
+}
+
+/* LINKS BAIXO */
+.bottom{
+    margin-top:25px;
+    text-align:center;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.bottom a{
+    text-decoration:none;
+    color:#666;
+    font-size:14px;
+}
+
+.bottom a:hover{
+    color:#E84A27;
+}
+
+/* MODAIS */
+.modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.7);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+    z-index:999;
+}
+
+.modal-box{
+    width:100%;
+    max-width:420px;
+    background:#fff;
+    border-radius:25px;
+    padding:35px;
+    position:relative;
+    animation:abrir .3s ease;
+}
+
+@keyframes abrir{
+    from{ opacity:0; transform:scale(.9); }
+    to{ opacity:1; transform:scale(1); }
+}
+
+.close{
+    position:absolute;
+    top:15px;
+    right:18px;
+    font-size:22px;
+    cursor:pointer;
+    color:#999;
+}
+
+.close:hover{
+    color:#E84A27;
+}
+
+.modal h2{
+    margin-bottom:20px;
+    color:#222;
+}
+
+.visitante{
+    text-align:center;
+}
+
+.visitante p{
+    margin:18px 0;
+    color:#555;
+}
+
+/* RESPONSIVO */
+@media(max-width:850px){
+    .card{ flex-direction:column; max-width:500px; }
+    .left{ padding:35px 25px; }
+    .left h1{ font-size:42px; }
+    .logo{ font-size:65px; }
+    .right{ padding:35px 25px; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+    <div class="left">
+        <div class="logo">🍔</div>
+        <h1>Lanche<br>Sabor Raiz</h1>
+        <p>O sabor autêntico que você merece.</p>
+    </div>
+
+    <div class="right">
+        <h2>Seja bem-vindo 👋</h2>
+
+        <!-- CAIXA DE MENSAGEM LOGIN -->
+        <div id="msgLogin" class="msg-box"></div>
+
+        <form onsubmit="login(event)">
+            <div class="group">
+                <label>E-mail</label>
+                <input id="loginEmail" type="email" placeholder="nome@exemplo.com" required>
+            </div>
+
+            <div class="group">
+                <label>Senha</label>
+                <input id="loginSenha" type="password" placeholder="Sua senha" required>
+            </div>
+
+            <div class="top-link">
+                <a href="#" onclick="abrir('senhaModal')">Esqueci minha senha</a>
+            </div>
+
+            <button type="submit">Entrar no sistema</button>
+        </form>
+
+        <div class="bottom">
+            <a href="#" onclick="abrir('cadastroModal')">
+                Não tem conta? <b>Cadastre-se</b>
+            </a>
+            <a href="#" onclick="abrir('visitanteModal')">
+                Acessar como visitante
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL CADASTRO -->
+<div class="modal" id="cadastroModal">
+    <div class="modal-box">
+        <span class="close" onclick="fechar('cadastroModal')">✖</span>
+        <h2>Criar Conta 🍔</h2>
+        
+        <div id="msgCadastro" class="msg-box"></div>
+
+        <form onsubmit="cadastrar(event)">
+            <div class="group">
+                <label>Nome</label>
+                <input id="cadastroNome" type="text" required>
+            </div>
+            <div class="group">
+                <label>E-mail</label>
+                <input id="cadastroEmail" type="email" required>
+            </div>
+            <div class="group">
+                <label>Senha</label>
+                <input id="cadastroSenha" type="password" required>
+            </div>
+            <button type="submit">Criar Conta</button>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL SENHA -->
+<div class="modal" id="senhaModal">
+    <div class="modal-box">
+        <span class="close" onclick="fechar('senhaModal')">✖</span>
+        <h2>Recuperar Senha 🔒</h2>
+        
+        <div id="msgSenha" class="msg-box"></div>
+
+        <form onsubmit="recuperar(event)">
+            <div class="group">
+                <label>E-mail</label>
+                <input id="recuperarEmail" type="email" required>
+            </div>
+            <button type="submit">Enviar recuperação</button>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL VISITANTE -->
+<div class="modal" id="visitanteModal">
+    <div class="modal-box visitante">
+        <span class="close" onclick="fechar('visitanteModal')">✖</span>
+        <h2>Modo Visitante 👀</h2>
+        <div id="msgVisitante" class="msg-box"></div>
+        <p>Você entrou como visitante.<br>Algumas funções ficam limitadas.</p>
+        <button onclick="visitante()">Continuar</button>
+    </div>
+</div>
+
+<!-- FIREBASE SCRIPT -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+import {
+    getAuth,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    sendPasswordResetEmail,
+    signInAnonymously
+} from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+
+/* SUAS CONFIGURAÇÕES EXATAS */
+const firebaseConfig = {
+    apiKey: "AIzaSyCBV3BRsynzIAS1jAcl124nYPeyUWHzfC0",
+    authDomain: "projeto-sabor-raiz.firebaseapp.com",
+    projectId: "projeto-sabor-raiz",
+    storageBucket: "projeto-sabor-raiz.firebasestorage.app",
+    messagingSenderId: "911413350410",
+    appId: "1:911413350410:web:49be44cc4a0c9e255b8ff3",
+    measurementId: "G-97TG3H7GD9"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+/* FUNÇÃO PARA EXIBIR MENSAGEM NA TELA */
+window.exibirMensagem = function(idElemento, texto, tipo) {
+    const box = document.getElementById(idElemento);
+    box.textContent = texto;
+    box.className = "msg-box"; 
+    
+    if (tipo === "sucesso") {
+        box.classList.add("msg-sucesso");
+    } else if (tipo === "erro") {
+        box.classList.add("msg-erro");
+    }
+
+    // Apaga a mensagem depois de 5 segundos
+    setTimeout(() => {
+        box.className = "msg-box";
+    }, 5000);
+}
+
+/* TRATAMENTO DE ERROS AMIGÁVEL E MELHORADO */
+function traduzirErroFirebase(error) {
+    console.error("Erro original:", error); 
+    switch (error.code) {
+        case 'auth/invalid-credential':
+        case 'auth/user-not-found':
+        case 'auth/wrong-password': 
+            return "Ops! E-mail ou senha incorretos. Tente novamente.";
+            
+        case 'auth/email-already-in-use': 
+            return "Esse e-mail já tem uma conta com a gente! Que tal fazer o login?";
+            
+        case 'auth/weak-password': 
+            return "Essa senha está muito curta. Digite pelo menos 6 caracteres 🔒";
+            
+        case 'auth/invalid-email': 
+            return "O e-mail digitado parece incompleto ou inválido.";
+            
+        case 'auth/too-many-requests': 
+            return "Muitas tentativas seguidas! Aguarde uns minutinhos e tente de novo ⏳";
+            
+        case 'auth/network-request-failed': 
+            return "Parece que você está sem internet 📶 Verifique sua conexão.";
+            
+        default: 
+            return "Puxa, ocorreu um erro inesperado 😕 Tente novamente mais tarde.";
+    }
+}
+
+/* LOGIN */
+window.login = async function(event){
+    event.preventDefault();
+    const email = document.getElementById("loginEmail").value;
+    const senha = document.getElementById("loginSenha").value;
+
+    try{
+        const userCredential = await signInWithEmailAndPassword(auth, email, senha);
+        exibirMensagem('msgLogin', "Login realizado com sucesso! Entrando...", "sucesso");
+        
+        document.getElementById("loginEmail").value = "";
+        document.getElementById("loginSenha").value = "";
+
+        setTimeout(() => {
+            window.location.href = "cardapio-premium.html";
+        }, 1500);
+
+    }catch(error){
+        exibirMensagem('msgLogin', traduzirErroFirebase(error), "erro");
+    }
+}
+
+/* CADASTRO */
+window.cadastrar = async function(event){
+    event.preventDefault();
+    const email = document.getElementById("cadastroEmail").value;
+    const senha = document.getElementById("cadastroSenha").value;
+
+    try{
+        await createUserWithEmailAndPassword(auth, email, senha);
+        exibirMensagem('msgCadastro', "Conta criada com sucesso!", "sucesso");
+        
+        document.getElementById("cadastroNome").value = "";
+        document.getElementById("cadastroEmail").value = "";
+        document.getElementById("cadastroSenha").value = "";
+
+        setTimeout(() => fechar("cadastroModal"), 2000);
+
+    }catch(error){
+        exibirMensagem('msgCadastro', traduzirErroFirebase(error), "erro");
+    }
+}
+
+/* RECUPERAR SENHA */
+window.recuperar = async function(event){
+    event.preventDefault();
+    const email = document.getElementById("recuperarEmail").value;
+
+    try{
+        await sendPasswordResetEmail(auth, email);
+        exibirMensagem('msgSenha', "Link de recuperação enviado para o e-mail!", "sucesso");
+        
+        setTimeout(() => { 
+            fechar("senhaModal"); 
+            document.getElementById("recuperarEmail").value = ""; 
+        }, 3000);
+
+    }catch(error){
+        exibirMensagem('msgSenha', traduzirErroFirebase(error), "erro");
+    }
+}
+
+/* VISITANTE */
+window.visitante = async function(){
+    try{
+        await signInAnonymously(auth);
+        exibirMensagem('msgVisitante', "Entrando como visitante...", "sucesso");
+        
+        setTimeout(() => {
+            window.location.href = "cardapio-premium.html";
+        }, 1500);
+
+    }catch(error){
+        exibirMensagem('msgVisitante', traduzirErroFirebase(error), "erro");
+    }
+}
+
+/* MODAIS */
+window.abrir = function(id){
+    document.getElementById(id).style.display="flex";
+    document.querySelectorAll('.msg-box').forEach(box => box.className = 'msg-box');
+}
+
+window.fechar = function(id){
+    document.getElementById(id).style.display="none";
+}
+
+window.onclick = function(event){
+    document.querySelectorAll(".modal").forEach(modal=>{
+        if(event.target===modal) modal.style.display="none";
+    });
+}
+</script>
+
+</body>
+</html>
+
